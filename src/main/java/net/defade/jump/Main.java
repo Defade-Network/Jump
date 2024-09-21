@@ -13,7 +13,7 @@ public class Main {
 
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, event -> {
             event.setSpawningInstance(jumpInstance);
-            event.getPlayer().setRespawnPoint(new Pos(7.5, 5, 2.5));
+            event.getPlayer().setRespawnPoint(JumpInstance.SPAWN_POSITION);
         });
 
         minecraftServer.start();
