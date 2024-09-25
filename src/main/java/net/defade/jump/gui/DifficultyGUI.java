@@ -24,7 +24,7 @@ public class DifficultyGUI extends Inventory {
             inventoryConditionResult.setCancel(true);
 
             if (slot >= 11 && slot <= 15) {
-                player.openInventory(new JumpGUI(Difficulties.values()[slot - 11]));
+                player.openInventory(new JumpGUI(player, Difficulties.values()[slot - 11]));
             }
         });
     }

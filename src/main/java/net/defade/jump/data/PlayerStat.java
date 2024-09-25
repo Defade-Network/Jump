@@ -27,7 +27,6 @@ public class PlayerStat {
                 jumpsTime.put(jump, playerData.getLong(jump.name()));
             }
         }
-        System.out.println("aa " + jumpsTime);
     }
 
     public boolean hasRealizedJump(Jumps jump) {
