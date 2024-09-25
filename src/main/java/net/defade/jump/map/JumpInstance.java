@@ -1,5 +1,8 @@
 package net.defade.jump.map;
 
+import net.defade.jump.event.PressurePlateEvent;
+import net.defade.jump.jumps.JumpTracker;
+import net.defade.jump.jumps.Jumps;
 import net.defade.minestom.amethyst.AmethystLoader;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -24,6 +27,7 @@ public class JumpInstance extends InstanceContainer {
         setChunkLoader(amethystLoader);
 
         registerPlayerRestrictions();
+        registerJumpStarts();
     }
 
     private void registerPlayerRestrictions() {
@@ -33,7 +37,17 @@ public class JumpInstance extends InstanceContainer {
                 })
                 .addListener(PlayerMoveEvent.class, event -> {
                     if (event.getPlayer().getPosition().y() < -10) {
-                        event.getPlayer().teleport(SPAWN_POSITION);
+                        Pos position;
+                        if (JumpTracker.getCurrentCheckpoint(event.getPlayer()) != null) {
+                            position = JumpTracker.getCurrentCheckpoint(event.getPlayer());
+                        } else if (JumpTracker.getPlayerJump(event.getPlayer()) != null) {
+                            Jumps jump = JumpTracker.getPlayerJump(event.getPlayer());
+                            position = jump.getMiddleStartPlate().withYaw(jump.getStartYaw());
+                        } else {
+                            position = SPAWN_POSITION;
+                        }
+
+                        event.getPlayer().teleport(position);
                     }
                 })
                 .addListener(PlayerBlockPlaceEvent.class, event -> {
@@ -42,5 +56,17 @@ public class JumpInstance extends InstanceContainer {
                 .addListener(PlayerBlockBreakEvent.class, event -> {
                     event.setCancelled(true);
                 });
+    }
+
+    private void registerJumpStarts() {
+        MinecraftServer.getGlobalEventHandler().addListener(PressurePlateEvent.class, event -> {
+            if (event.isPressed()) {
+                for (Jumps jump : Jumps.values()) {
+                    if (jump.getStartPlates().contains(event.getPos())) {
+                        JumpTracker.startJumpForPlayer(event.getPlayer(), jump);
+                    }
+                }
+            }
+        });
     }
 }

@@ -1,8 +1,10 @@
 package net.defade.jump;
 
 import net.defade.jump.gui.DifficultyGUI;
+import net.defade.jump.jumps.JumpTracker;
 import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Items;
+import net.defade.jump.utils.PressurePlateUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -12,6 +14,9 @@ import net.minestom.server.event.player.PlayerUseItemEvent;
 public class Main {
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
+
+        PressurePlateUtils.registerPressurePlateEvent();
+        JumpTracker.registerEvents();
 
         JumpInstance jumpInstance = new JumpInstance();
 
