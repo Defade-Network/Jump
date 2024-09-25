@@ -1,5 +1,6 @@
 package net.defade.jump;
 
+import net.defade.jump.data.PlayerStatManager;
 import net.defade.jump.gui.DifficultyGUI;
 import net.defade.jump.jumps.JumpTracker;
 import net.defade.jump.map.JumpInstance;
@@ -16,6 +17,7 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
 
         PressurePlateUtils.registerPressurePlateEvent();
+        PlayerStatManager.registerEvents();
         JumpTracker.registerEvents();
 
         JumpInstance jumpInstance = new JumpInstance();

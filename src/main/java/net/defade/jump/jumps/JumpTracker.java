@@ -1,5 +1,7 @@
 package net.defade.jump.jumps;
 
+import net.defade.jump.data.PlayerStat;
+import net.defade.jump.data.PlayerStatManager;
 import net.defade.jump.event.PressurePlateEvent;
 import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Utils;
@@ -56,19 +58,41 @@ public class JumpTracker {
                     Pos blockPosUnderPlayer = new Pos(player.getPosition().blockX(), Math.floor(player.getPosition().y() - 0.1), player.getPosition().blockZ());
                     Block blockUnderPlayer = event.getInstance().getBlock(blockPosUnderPlayer);
                     if (blockUnderPlayer.compare(FINISH_BLOCK)) {
-                        if (jump.getFinishPlate().equals(blockPosUnderPlayer)) {
-                            long time = System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME);
-                            player.sendMessage(MM.deserialize("<green>Vous avez terminé le parcours en <white>" + time + "ms<green>."));
-
-                            player.removeTag(PLAYER_JUMP);
-                            player.removeTag(PLAYER_JUMP_START_TIME);
-                            player.removeTag(CHECKPOINT_POS);
-
-                            player.teleport(JumpInstance.SPAWN_POSITION);
-                        } else {
+                        if (!jump.getFinishPlate().equals(blockPosUnderPlayer)) {
                             player.sendMessage(MM.deserialize("<red>Ne trichez pas."));
                             finishJump(player, true);
+                            return;
                         }
+
+                        PlayerStat playerStat = PlayerStatManager.getPlayerStat(player);
+                        long time = System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME);
+                        player.sendMessage(MM.deserialize("<green>Temps final: <white>" + Utils.convertToReadableTime(time)));
+
+                        boolean hasReward;
+
+                        if (playerStat.hasRealizedJump(jump)) {
+                            long previousTime = playerStat.getJumpTime(jump);
+
+                            if (time < previousTime) {
+                                playerStat.updateJumpTime(jump, time);
+                                player.sendMessage(MM.deserialize("<green>Vous avez battu votre record!"));
+                            }
+
+                            long timeForReward = jump.getTimeForReward();
+                            hasReward = previousTime > timeForReward && time <= timeForReward;
+                        } else {
+                            playerStat.updateJumpTime(jump, time);
+                            hasReward = time <= jump.getTimeForReward();
+                        }
+
+                        if (hasReward) {
+                            player.sendMessage(MM.deserialize("<green>Vous avez battu le temps pour la récompense!"));
+
+                            player.addCrystals(jump.getCrystalReward());
+                            player.addEndermites(jump.getEndermiteReward());
+                        }
+
+                        finishJump(player, true);
                     }
                 })
                 .addListener(PlayerTickEvent.class, event -> {
