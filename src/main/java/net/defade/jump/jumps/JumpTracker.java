@@ -8,6 +8,7 @@ import net.defade.jump.utils.Items;
 import net.defade.jump.utils.Utils;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
@@ -74,16 +75,21 @@ public class JumpTracker {
 
                         PlayerStat playerStat = PlayerStatManager.getPlayerStat(player);
                         long time = System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME);
-                        player.sendMessage(MM.deserialize("<green>Temps final: <white>" + Utils.convertToReadableTime(time)));
+
+                        player.playSound(Sound.sound().type(SoundEvent.ENTITY_PLAYER_LEVELUP).pitch(1).volume(1000).build());
+                        player.sendMessage(MM.deserialize(
+                                "<gray>» <color:#ffcc24>Vous avez fini le jump <jump> " +
+                                "<color:#ffcc24>en <color:#e6423c>" + Utils.convertToReadableTime(time) + "<color:#ffcc24>!",
+                                Placeholder.component("jump", jump.getName())
+                        ));
 
                         boolean hasReward;
-
                         if (playerStat.hasRealizedJump(jump)) {
                             long previousTime = playerStat.getJumpTime(jump);
 
                             if (time < previousTime) {
                                 playerStat.updateJumpTime(jump, time);
-                                player.sendMessage(MM.deserialize("<green>Vous avez battu votre record!"));
+                                player.sendMessage(MM.deserialize("<green>Vous avez battu votre record!")); // TODO
                             }
 
                             long timeForReward = jump.getTimeForReward();
@@ -94,7 +100,43 @@ public class JumpTracker {
                         }
 
                         if (hasReward) {
-                            player.sendMessage(MM.deserialize("<green>Vous avez battu le temps pour la récompense!"));
+                            player.sendMessage(MM.deserialize(
+                                    "<gray>» <color:#ffcc24>Défi Remporté! Vous recevez <yellow>⛃ " + jump.getCrystalReward() + " Coins " +
+                                            "<color:#ffcc24>et <color:#14aeff>❂ " + jump.getEndermiteReward() + " Osmiums<color:#ffcc24>!"));
+
+                            player.playSound(Sound.sound().type(SoundEvent.BLOCK_BEACON_ACTIVATE).pitch(1).volume(1000).build());
+                            player.sendPacket(new ParticlePacket(
+                                    Particle.SOUL,
+                                    true,
+                                    JumpInstance.SPAWN_POSITION,
+                                    Pos.ZERO,
+                                    0.5F,
+                                    30
+                            ));
+                            player.sendPacket(new ParticlePacket(
+                                    Particle.SOUL_FIRE_FLAME,
+                                    true,
+                                    player.getPosition(),
+                                    Pos.ZERO,
+                                    0.5F,
+                                    30
+                            ));
+                            player.sendPacket(new ParticlePacket(
+                                    Particle.SOUL,
+                                    true,
+                                    player.getPosition(),
+                                    Pos.ZERO,
+                                    0.1F,
+                                    20
+                            ));
+                            player.sendPacket(new ParticlePacket(
+                                    Particle.SOUL_FIRE_FLAME,
+                                    true,
+                                    player.getPosition(),
+                                    new Pos(0.25, 0.5, 0.25),
+                                    0.1F,
+                                    20
+                            ));
 
                             player.addCrystals(jump.getCrystalReward());
                             player.addEndermites(jump.getEndermiteReward());

@@ -4,6 +4,7 @@ import net.defade.jump.event.PressurePlateEvent;
 import net.defade.jump.jumps.JumpTracker;
 import net.defade.jump.jumps.Jumps;
 import net.defade.minestom.amethyst.AmethystLoader;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
@@ -12,6 +13,7 @@ import net.minestom.server.event.player.PlayerBlockPlaceEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.world.DimensionType;
 
 import java.util.UUID;
@@ -48,6 +50,7 @@ public class JumpInstance extends InstanceContainer {
                         }
 
                         event.getPlayer().teleport(position);
+                        event.getPlayer().playSound(Sound.sound().type(SoundEvent.ENTITY_ENDERMAN_TELEPORT).pitch(1).volume(1).build());
                     }
                 })
                 .addListener(PlayerBlockPlaceEvent.class, event -> {
