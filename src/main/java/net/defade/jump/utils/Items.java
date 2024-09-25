@@ -25,4 +25,16 @@ public class Items {
 
     public static final ItemStack NEXT_BUTTON = ItemStack.of(Material.ARROW)
             .with(ItemComponent.ITEM_NAME, MM.deserialize("<dark_green>Suivant"));
+
+    public static final ItemStack HUB = ItemStack.of(Material.DARK_OAK_DOOR)
+            .with(ItemComponent.ITEM_NAME, MM.deserialize("<gray>» <color:#e82c2c>Hub"));
+
+    public static final ItemStack QUIT_JUMP = ItemStack.of(Material.BARRIER)
+            .with(ItemComponent.ITEM_NAME, MM.deserialize("<gray>» <color:#e82c2c>Quitter le jump"));
+
+    public static final ItemStack PLAYERS_SHOWN = ItemStack.of(Material.LIME_DYE)
+            .with(ItemComponent.ITEM_NAME, MM.deserialize("<gray>» <color:#23cc21>Joueurs Visibles"));
+
+    public static final ItemStack PLAYERS_HIDDEN = ItemStack.of(Material.RED_DYE)
+            .with(ItemComponent.ITEM_NAME, MM.deserialize("<gray>» <color:#5a5a5a>Joueurs Cachés"));
 }

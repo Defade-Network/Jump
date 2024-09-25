@@ -39,7 +39,6 @@ public class PlayerStat {
 
     public void updateJumpTime(Jumps jump, long time) {
         jumpsTime.put(jump, time);
-        System.out.println("update jump time for " + player.getUsername() + " jump " + jump.name() + " time " + time);
         MongoUtils.updateValue("jump", player.getUuid().toString(), jump.name(), time);
     }
 }

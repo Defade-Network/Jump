@@ -64,6 +64,7 @@ public class JumpInstance extends InstanceContainer {
                 for (Jumps jump : Jumps.values()) {
                     if (jump.getStartPlates().contains(event.getPos())) {
                         JumpTracker.startJumpForPlayer(event.getPlayer(), jump);
+                        break;
                     }
                 }
             }

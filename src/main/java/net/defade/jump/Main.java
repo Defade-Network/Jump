@@ -6,13 +6,19 @@ import net.defade.jump.jumps.JumpTracker;
 import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Items;
 import net.defade.jump.utils.PressurePlateUtils;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.sound.SoundEvent;
 
 public class Main {
+    private static final MiniMessage MM = MiniMessage.miniMessage();
+
     public static void main(String[] args) {
         MinecraftServer minecraftServer = MinecraftServer.init();
 
@@ -27,15 +33,38 @@ public class Main {
             event.getPlayer().setRespawnPoint(JumpInstance.SPAWN_POSITION);
         });
 
-        MinecraftServer.getGlobalEventHandler()
-                .addListener(PlayerSpawnEvent.class, event -> event.getPlayer().getInventory().setItemStack(0, Items.MENU_ITEM))
-                .addListener(ItemDropEvent.class, event -> event.setCancelled(true))
-                .addListener(PlayerUseItemEvent.class, event -> {
-                    if (event.getPlayer().getInventory().getItemInMainHand().isSimilar(Items.MENU_ITEM)) {
-                        event.getPlayer().openInventory(new DifficultyGUI());
-                    }
-                });
+        registerItemActions();
 
         minecraftServer.start();
+    }
+
+    private static void registerItemActions() {
+        MinecraftServer.getGlobalEventHandler()
+                .addListener(PlayerSpawnEvent.class, event -> {
+                    event.getPlayer().getInventory().setItemStack(0, Items.MENU_ITEM);
+                    event.getPlayer().getInventory().setItemStack(7, Items.PLAYERS_SHOWN);
+                    event.getPlayer().getInventory().setItemStack(8, Items.HUB);
+                })
+                .addListener(ItemDropEvent.class, event -> event.setCancelled(true))
+                .addListener(PlayerUseItemEvent.class, event -> {
+                    Player player = event.getPlayer();
+                    if (player.getInventory().getItemInMainHand().isSimilar(Items.MENU_ITEM)) {
+                        player.openInventory(new DifficultyGUI());
+                    } else if (player.getInventory().getItemInMainHand().isSimilar(Items.HUB)) {
+                        player.sendToServer("hub");
+                    } else if (player.getInventory().getItemInMainHand().isSimilar(Items.PLAYERS_SHOWN)) {
+                        player.getInventory().setItemStack(7, Items.PLAYERS_HIDDEN);
+                        player.updateViewerRule(others -> false);
+
+                        player.sendMessage(MM.deserialize("<gray>» <red>Les joueurs sont maintenant cachés."));
+                        player.playSound(Sound.sound().type(SoundEvent.UI_BUTTON_CLICK).pitch(2).volume(0.4F).build());
+                    } else if (player.getInventory().getItemInMainHand().isSimilar(Items.PLAYERS_HIDDEN)) {
+                        player.getInventory().setItemStack(7, Items.PLAYERS_SHOWN);
+                        player.updateViewerRule(others -> true);
+
+                        player.sendMessage(MM.deserialize("<gray>» <green>Les joueurs sont maintenant visibles."));
+                        player.playSound(Sound.sound().type(SoundEvent.UI_BUTTON_CLICK).pitch(2).volume(0.4F).build());
+                    }
+                });
     }
 }

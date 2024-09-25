@@ -4,14 +4,20 @@ import net.defade.jump.data.PlayerStat;
 import net.defade.jump.data.PlayerStatManager;
 import net.defade.jump.event.PressurePlateEvent;
 import net.defade.jump.map.JumpInstance;
+import net.defade.jump.utils.Items;
 import net.defade.jump.utils.Utils;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerTickEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
 public class JumpTracker {
@@ -29,6 +35,8 @@ public class JumpTracker {
         finishJump(player, false);
         player.setTag(PLAYER_JUMP, jump);
         player.setTag(PLAYER_JUMP_START_TIME, System.currentTimeMillis());
+
+        player.getInventory().setItemStack(8, Items.QUIT_JUMP);
     }
 
     public static void registerEvents() {
@@ -103,6 +111,33 @@ public class JumpTracker {
 
                     String time = Utils.convertToReadableTime(System.currentTimeMillis() - event.getPlayer().getTag(PLAYER_JUMP_START_TIME));
                     event.getPlayer().sendActionBar(MM.deserialize("<green>Temps: <white>" + time));
+                })
+                .addListener(PlayerUseItemEvent.class, event -> {
+                    Player player = event.getPlayer();
+
+                    if (event.getItemStack().isSimilar(Items.QUIT_JUMP)) {
+                        finishJump(player, true);
+
+                        player.sendMessage(MM.deserialize("<gray>» <red>Vous avez quitté le jump!"));
+
+                        player.playSound(Sound.sound().type(SoundEvent.BLOCK_BEACON_DEACTIVATE).pitch(1).volume(0.4F).build());
+                        player.sendPacket(new ParticlePacket(
+                                Particle.ASH,
+                                true,
+                                player.getPosition(),
+                                new Pos(1, 2, 1),
+                                0.1F,
+                                200
+                        ));
+                        player.sendPacket(new ParticlePacket(
+                                Particle.LARGE_SMOKE,
+                                true,
+                                player.getPosition(),
+                                new Pos(1, 0.7, 1),
+                                0.1F,
+                                20
+                        ));
+                    }
                 });
     }
 
@@ -119,6 +154,7 @@ public class JumpTracker {
         player.removeTag(PLAYER_JUMP_START_TIME);
         player.removeTag(CHECKPOINT_POS);
 
+        player.getInventory().setItemStack(8, Items.HUB);
         if (teleport) player.teleport(JumpInstance.SPAWN_POSITION);
     }
 }
