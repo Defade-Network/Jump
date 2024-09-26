@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "net.defade"
@@ -16,4 +17,20 @@ repositories {
 dependencies {
     implementation("net.defade:minestom:1.21-939314c7b9")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
+}
+
+// Set compile version to 21
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+tasks.jar {
+    manifest {
+        attributes("Main-Class" to "net.defade.jump.Main")
+    }
 }

@@ -7,6 +7,7 @@ import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Items;
 import net.defade.jump.utils.block.PressurePlateUtils;
 import net.defade.jump.utils.block.TrapdoorHandler;
+import net.defade.minestom.servers.minigame.MiniGameInstance;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minestom.server.MinecraftServer;
@@ -16,6 +17,7 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.sound.SoundEvent;
+import java.util.UUID;
 
 public class Main {
     private static final MiniMessage MM = MiniMessage.miniMessage();
@@ -33,6 +35,28 @@ public class Main {
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, event -> {
             event.setSpawningInstance(jumpInstance);
             event.getPlayer().setRespawnPoint(JumpInstance.SPAWN_POSITION);
+        });
+
+        MinecraftServer.getServerApi().registerMiniGameInstance(new MiniGameInstance() {
+            @Override
+            public UUID getUuid() {
+                return jumpInstance.getUniqueId();
+            }
+
+            @Override
+            public int getPlayerCount() {
+                return MinecraftServer.getConnectionManager().getOnlinePlayerCount();
+            }
+
+            @Override
+            public int getMaxPlayers() {
+                return 100;
+            }
+
+            @Override
+            public boolean acceptPlayers() {
+                return getPlayerCount() < getMaxPlayers();
+            }
         });
 
         registerItemActions();
