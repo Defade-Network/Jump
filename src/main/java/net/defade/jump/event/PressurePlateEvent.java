@@ -1,6 +1,6 @@
 package net.defade.jump.event;
 
-import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.instance.block.Block;
@@ -9,11 +9,11 @@ import org.jetbrains.annotations.NotNull;
 public class PressurePlateEvent implements PlayerEvent {
     private final Player player;
     private final Block pressurePlate;
-    private final Pos pos;
+    private final Point pos;
 
     private final boolean isPressed;
 
-    public PressurePlateEvent(Player player, Block pressurePlate, Pos pos, boolean isPressed) {
+    public PressurePlateEvent(Player player, Block pressurePlate, Point pos, boolean isPressed) {
         this.player = player;
         this.pressurePlate = pressurePlate;
         this.pos = pos;
@@ -24,7 +24,7 @@ public class PressurePlateEvent implements PlayerEvent {
         return pressurePlate;
     }
 
-    public Pos getPos() {
+    public Point getPos() {
         return pos;
     }
 

@@ -5,7 +5,8 @@ import net.defade.jump.gui.DifficultyGUI;
 import net.defade.jump.jumps.JumpTracker;
 import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Items;
-import net.defade.jump.utils.PressurePlateUtils;
+import net.defade.jump.utils.block.PressurePlateUtils;
+import net.defade.jump.utils.block.TrapdoorHandler;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minestom.server.MinecraftServer;
@@ -23,6 +24,7 @@ public class Main {
         MinecraftServer minecraftServer = MinecraftServer.init();
 
         PressurePlateUtils.registerPressurePlateEvent();
+        TrapdoorHandler.registerEvents();
         PlayerStatManager.registerEvents();
         JumpTracker.registerEvents();
 
