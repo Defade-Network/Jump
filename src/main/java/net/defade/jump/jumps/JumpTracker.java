@@ -10,6 +10,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerMoveEvent;
@@ -64,7 +65,7 @@ public class JumpTracker {
                         return;
                     }
 
-                    Pos blockPosUnderPlayer = new Pos(player.getPosition().blockX(), Math.floor(player.getPosition().y() - 0.1), player.getPosition().blockZ());
+                    BlockVec blockPosUnderPlayer = new BlockVec(player.getPosition().sub(0, 0.1, 0));
                     Block blockUnderPlayer = event.getInstance().getBlock(blockPosUnderPlayer);
                     if (blockUnderPlayer.compare(FINISH_BLOCK)) {
                         if (!jump.getFinishPlate().equals(blockPosUnderPlayer)) {
