@@ -181,9 +181,10 @@ public class JumpTracker {
                     Player player = event.getPlayer();
 
                     if (event.getItemStack().isSimilar(Items.QUIT_JUMP)) {
-                        finishJump(player, true);
+                        finishJump(player, false);
 
                         player.sendMessage(MM.deserialize("<gray>» <red>Vous avez quitté le jump!"));
+                        player.teleport(JumpInstance.SPAWN_POSITION);
 
                         player.playSound(Sound.sound().type(SoundEvent.BLOCK_BEACON_DEACTIVATE).pitch(1).volume(0.4F).build());
                         player.sendPacket(new ParticlePacket(
@@ -215,11 +216,12 @@ public class JumpTracker {
     }
 
     private static void finishJump(Player player, boolean teleport) {
+        if (teleport) player.teleport(getPlayerJump(player).getMiddleStartPlate().withYaw(getPlayerJump(player).getStartYaw()));
+
         player.removeTag(PLAYER_JUMP);
         player.removeTag(PLAYER_JUMP_START_TIME);
         player.removeTag(CHECKPOINT_POS);
 
         player.getInventory().setItemStack(8, Items.HUB);
-        if (teleport) player.teleport(JumpInstance.SPAWN_POSITION);
     }
 }
