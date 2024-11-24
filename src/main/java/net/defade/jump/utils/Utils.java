@@ -14,9 +14,11 @@ public class Utils {
         long hours = (milliseconds / (1000 * 60 * 60)) % 24;
 
         if (hours > 0) {
-            return String.format("%dh %02dm %02ds %03dms", hours, minutes, seconds, ms);
+            return String.format("%d:%02d:%02ds", hours, minutes, seconds);
+        } else if (minutes > 0) {
+            return String.format("%d:%02d.%d", minutes, seconds, ms / 100);
         } else {
-            return String.format("%02dm %02ds %03dms", minutes, seconds, ms);
+            return String.format("%.2fs", seconds + ms / 1000.0);
         }
     }
 }

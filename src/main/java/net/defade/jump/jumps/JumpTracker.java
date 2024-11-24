@@ -7,6 +7,7 @@ import net.defade.jump.map.JumpInstance;
 import net.defade.jump.utils.Items;
 import net.defade.jump.utils.Utils;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.minestom.server.MinecraftServer;
@@ -147,13 +148,16 @@ public class JumpTracker {
                     }
                 })
                 .addListener(PlayerTickEvent.class, event -> {
-                    Jumps jump = getPlayerJump(event.getPlayer());
+                    Player player = event.getPlayer();
+                    Jumps jump = getPlayerJump(player);
                     if (jump == null) {
                         return;
                     }
 
-                    String time = Utils.convertToReadableTime(System.currentTimeMillis() - event.getPlayer().getTag(PLAYER_JUMP_START_TIME));
-                    event.getPlayer().sendActionBar(MM.deserialize("<green>Temps: <white>" + time));
+                    String time = Utils.convertToReadableTime(System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME));
+                    player.sendActionBar(MM.deserialize("<jump_name><dark_gray> - <white>" + time,
+                            Placeholder.component("jump_name", jump.getName())
+                    ));
                 })
                 .addListener(PlayerUseItemEvent.class, event -> {
                     Player player = event.getPlayer();
