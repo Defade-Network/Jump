@@ -10,6 +10,8 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Pos;
@@ -22,6 +24,8 @@ import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+
+import java.time.Duration;
 
 public class JumpTracker {
     private static final MiniMessage MM = MiniMessage.miniMessage();
@@ -53,6 +57,11 @@ public class JumpTracker {
 
                     if (event.isPressed() && event.getPressurePlate().compare(CHECKPOINT_BLOCK)) {
                         player.setTag(CHECKPOINT_POS, player.getPosition());
+
+                        player.playSound(Sound.sound().type(SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE).pitch(1).volume(0.4F).build());
+                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0),Duration.ofMillis(800),Duration.ofMillis(400)));
+                        player.sendTitlePart(TitlePart.TITLE, MM.deserialize(""));
+                        player.sendTitlePart(TitlePart.SUBTITLE, MM.deserialize("<b><green>Checkpoint!</green></b>"));
                     }
                 })
                 .addListener(PlayerMoveEvent.class, event -> {
@@ -78,11 +87,10 @@ public class JumpTracker {
                         PlayerStat playerStat = PlayerStatManager.getPlayerStat(player);
                         long time = System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME);
 
-                        player.playSound(Sound.sound().type(SoundEvent.ENTITY_PLAYER_LEVELUP).pitch(1).volume(1000).build());
-                        player.sendMessage(MM.deserialize(
-                                "<gray>» <color:#ffcc24>Vous avez fini le jump <jump> " +
-                                "<color:#ffcc24>en <color:#e6423c>" + Utils.convertToReadableTime(time) + "<color:#ffcc24>!",
-                                Placeholder.component("jump", jump.getName())
+                        player.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(0),Duration.ofMillis(4000),Duration.ofMillis(800)));
+                        player.sendTitlePart(TitlePart.TITLE, MM.deserialize(""));
+                        player.sendTitlePart(TitlePart.SUBTITLE, MM.deserialize("<jump_name><dark_gray> - <white>" + Utils.convertToReadableTime(time),
+                                Placeholder.component("jump_name", jump.getName())
                         ));
 
                         boolean hasReward;
@@ -103,8 +111,8 @@ public class JumpTracker {
 
                         if (hasReward) {
                             player.sendMessage(MM.deserialize(
-                                    "<gray>» <color:#ffcc24>Défi Remporté! Vous recevez <yellow>⛃ " + jump.getCrystalReward() + " Coins " +
-                                            "<color:#ffcc24>et <color:#14aeff>❂ " + jump.getEndermiteReward() + " Osmiums<color:#ffcc24>!"));
+                                    "\n<gray>» <b><gradient:#FFE259:#FFA751>Défi Remporté!</gradient></b><gray> Vous recevez <yellow>⛃ " + jump.getCrystalReward() + " Coins " +
+                                            "<gray>et <color:#14aeff>❂ " + jump.getEndermiteReward() + " Endermites<gray>!"));
 
                             player.playSound(Sound.sound().type(SoundEvent.BLOCK_BEACON_ACTIVATE).pitch(1).volume(1000).build());
                             player.sendPacket(new ParticlePacket(
@@ -145,6 +153,7 @@ public class JumpTracker {
                         }
 
                         finishJump(player, true);
+                        player.playSound(Sound.sound().type(SoundEvent.ENTITY_PLAYER_LEVELUP).pitch(1).volume(0.6F).build());
                     }
                 })
                 .addListener(PlayerTickEvent.class, event -> {
@@ -157,6 +166,15 @@ public class JumpTracker {
                     String time = Utils.convertToReadableTime(System.currentTimeMillis() - player.getTag(PLAYER_JUMP_START_TIME));
                     player.sendActionBar(MM.deserialize("<jump_name><dark_gray> - <white>" + time,
                             Placeholder.component("jump_name", jump.getName())
+                    ));
+
+                    player.sendPacket(new ParticlePacket(
+                            Particle.END_ROD,
+                            true,
+                            jump.getFinishPlate().add(0.5, 0.5, 0.5),
+                            new Pos(0.25, 0.25, 0.25),
+                            0.05F,
+                            1
                     ));
                 })
                 .addListener(PlayerUseItemEvent.class, event -> {

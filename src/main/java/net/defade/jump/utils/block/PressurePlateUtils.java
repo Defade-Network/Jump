@@ -51,7 +51,7 @@ public class PressurePlateUtils {
                                 EventDispatcher.call(new PressurePlateEvent(player, block, blockPos, true));
 
                                 player.sendPacket(new BlockChangePacket(blockPos, block.withProperty("power", "15").stateId()));
-                                player.playSound(Sound.sound().type(SoundEvent.BLOCK_STONE_PRESSURE_PLATE_CLICK_ON).pitch(1).volume(1).build());
+                                //player.playSound(Sound.sound().type(SoundEvent.BLOCK_STONE_PRESSURE_PLATE_CLICK_ON).pitch(1).volume(1).build());
                             } else {
                                 toRemove.remove(blockPos);
                             }
@@ -64,7 +64,7 @@ public class PressurePlateUtils {
                         EventDispatcher.call(new PressurePlateEvent(player, playerMoveEvent.getInstance().getBlock(pos), pos, false));
 
                         player.sendPacket(new BlockChangePacket(pos, playerMoveEvent.getInstance().getBlock(pos).withProperty("power", "0").stateId()));
-                        player.playSound(Sound.sound().type(SoundEvent.BLOCK_STONE_PRESSURE_PLATE_CLICK_OFF).pitch(1).volume(1).build());
+                        //player.playSound(Sound.sound().type(SoundEvent.BLOCK_STONE_PRESSURE_PLATE_CLICK_OFF).pitch(1).volume(1).build());
                     }
                 });
     }
