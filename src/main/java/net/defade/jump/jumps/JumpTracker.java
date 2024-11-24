@@ -93,18 +93,36 @@ public class JumpTracker {
                                 Placeholder.component("jump_name", jump.getName())
                         ));
 
+                        Component challenge_time_component = Component.text("");
+                        Component best_time_component = Component.text("");
                         boolean hasReward;
                         if (playerStat.hasRealizedJump(jump)) {
                             long previousTime = playerStat.getJumpTime(jump);
+                            long timeForReward = jump.getTimeForReward();
+
+                            if (previousTime >= timeForReward) { //Challenge never completed
+                                best_time_component = Component.text("record: "  + Utils.convertToReadableTime(previousTime));
+                                challenge_time_component = Component.text(", défi: " + Utils.convertToReadableTime(jump.getTimeForReward()));
+                            }
 
                             if (time < previousTime) {
                                 playerStat.updateJumpTime(jump, time);
-                                player.sendMessage(MM.deserialize("<green>Vous avez battu votre record!")); // TODO
+
+                                player.sendTitlePart(TitlePart.TITLE, MM.deserialize("<b><gradient:#FFA751:#FFD959>RECORD BATTU!</gradient></b>"));
+                                best_time_component = MiniMessage.miniMessage().deserialize("record: <previous_time> -> <yellow><best_time></yellow>",
+                                            Placeholder.component("previous_time", Component.text(Utils.convertToReadableTime(previousTime))),
+                                            Placeholder.component("best_time", Component.text(Utils.convertToReadableTime(time)))
+                                        ); // Personal record
                             }
 
-                            long timeForReward = jump.getTimeForReward();
                             hasReward = previousTime > timeForReward && time <= timeForReward;
+
+                            if (previousTime <= timeForReward && previousTime < time) //Challenge completed, but not personal record
+                                best_time_component = Component.text("record: "  + Utils.convertToReadableTime(previousTime));
+
                         } else {
+                            challenge_time_component = Component.text("défi: "  + Utils.convertToReadableTime(jump.getTimeForReward()));
+                            best_time_component = Component.text("record: "  + Utils.convertToReadableTime(time));
                             playerStat.updateJumpTime(jump, time);
                             hasReward = time <= jump.getTimeForReward();
                         }
@@ -148,9 +166,21 @@ public class JumpTracker {
                                     20
                             ));
 
+                            challenge_time_component = Component.text(", défi: " + Utils.convertToReadableTime(jump.getTimeForReward()));
+
                             player.addCrystals(jump.getCrystalReward());
                             player.addEndermites(jump.getEndermiteReward());
                         }
+
+                        player.sendMessage(MM.deserialize(
+                                "<gray>» <color:#ffcc24>Vous avez fini le jump <jump> " +
+                                        "<color:#ffcc24>en<color:#e6423c> <time> <color:#ffcc24>! <gray>(<best_time><challenge_time>)",
+                                Placeholder.component("jump", jump.getName()),
+                                Placeholder.component("time", Component.text(Utils.convertToReadableTime(time))),
+                                Placeholder.component("challenge_time", challenge_time_component),
+                                Placeholder.component("best_time", best_time_component)
+                        ));
+
 
                         finishJump(player, true);
                         player.playSound(Sound.sound().type(SoundEvent.ENTITY_PLAYER_LEVELUP).pitch(1).volume(0.6F).build());
