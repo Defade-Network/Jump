@@ -2,9 +2,11 @@ package net.defade.jump.gui;
 
 import net.defade.jump.jumps.Difficulties;
 import net.defade.jump.utils.Items;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.sound.SoundEvent;
 
 public class DifficultyGUI extends Inventory {
     public DifficultyGUI() {
@@ -24,6 +26,7 @@ public class DifficultyGUI extends Inventory {
             inventoryConditionResult.setCancel(true);
 
             if (slot >= 11 && slot <= 15) {
+                player.playSound(Sound.sound().type(SoundEvent.BLOCK_DISPENSER_DISPENSE).pitch(2).volume(0.6F).build());
                 player.openInventory(new JumpGUI(player, Difficulties.values()[slot - 11]));
             }
         });

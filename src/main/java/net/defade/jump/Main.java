@@ -76,6 +76,7 @@ public class Main {
                     Player player = event.getPlayer();
                     if (player.getInventory().getItemInMainHand().isSimilar(Items.MENU_ITEM)) {
                         player.openInventory(new DifficultyGUI());
+                        player.playSound(Sound.sound().type(SoundEvent.BLOCK_DISPENSER_DISPENSE).pitch(1.5F).volume(0.6F).build());
                     } else if (player.getInventory().getItemInMainHand().isSimilar(Items.HUB)) {
                         player.sendToServer("hub");
                     } else if (player.getInventory().getItemInMainHand().isSimilar(Items.PLAYERS_SHOWN)) {
