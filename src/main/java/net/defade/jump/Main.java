@@ -17,6 +17,7 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.sound.SoundEvent;
+import java.util.Set;
 import java.util.UUID;
 
 public class Main {
@@ -56,6 +57,16 @@ public class Main {
             @Override
             public boolean acceptPlayers() {
                 return getPlayerCount() < getMaxPlayers();
+            }
+
+            @Override
+            public boolean requirePlayingPlayersToRejoin() {
+                return false;
+            }
+
+            @Override
+            public Set<UUID> getPlayersRequiredToRejoin() {
+                return Set.of();
             }
         });
 
