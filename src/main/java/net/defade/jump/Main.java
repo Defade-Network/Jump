@@ -38,6 +38,10 @@ public class Main {
             event.getPlayer().setRespawnPoint(JumpInstance.SPAWN_POSITION);
         });
 
+        registerItemActions();
+
+        minecraftServer.start();
+
         MinecraftServer.getServerApi().registerMiniGameInstance(new MiniGameInstance() {
             @Override
             public UUID getUuid() {
@@ -69,10 +73,6 @@ public class Main {
                 return Set.of();
             }
         });
-
-        registerItemActions();
-
-        minecraftServer.start();
     }
 
     private static void registerItemActions() {

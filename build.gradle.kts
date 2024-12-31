@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.defade:minestom:1.21-769865102b")
+    implementation("net.defade:minestom:1.21-00b0b267f3")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
 }
 
